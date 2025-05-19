@@ -5,6 +5,7 @@
   text-align: center;
 }
 
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -40,3 +41,14 @@
 .read-the-docs {
   color: #888;
 }
+
+.scroll-container {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE 10+ */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;               /* Chrome, Safari */
+}
+
+
