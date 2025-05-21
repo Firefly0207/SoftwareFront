@@ -1,7 +1,10 @@
-// src/components/Layout.jsx
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-function Layout({ children }) {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div
       style={{
@@ -15,6 +18,6 @@ function Layout({ children }) {
       {children}
     </div>
   );
-}
+};
 
 export default Layout;

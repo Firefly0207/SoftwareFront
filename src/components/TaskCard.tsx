@@ -1,7 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function TaskCard({ id, title, description, dueDate }) {
+interface TaskCardProps {
+  id: number | string;
+  title: string;
+  description: string;
+  dueDate: string;
+}
+
+const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, dueDate }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -57,6 +64,6 @@ function TaskCard({ id, title, description, dueDate }) {
       </button>
     </div>
   );
-}
+};
 
 export default TaskCard;

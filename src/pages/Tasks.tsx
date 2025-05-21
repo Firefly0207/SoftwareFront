@@ -1,15 +1,21 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import TaskCard from '../components/TaskCard';
 
-const dummyTasks = [
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+}
+
+const dummyTasks: Task[] = [
   { id: 1, title: 'Task 1', description: 'short description for task', dueDate: '00d 00h 00m' },
   { id: 2, title: 'Task 2', description: 'short description for task', dueDate: '01d 03h 20m' },
   { id: 3, title: 'Task 3', description: 'short description for task', dueDate: '02d 08h 15m' },
   { id: 4, title: 'Task 4', description: 'short description for task', dueDate: '05d 00h 00m' },
 ];
 
-function TaskPage() {
+const TaskPage: React.FC = () => {
   return (
     <div>
       <div
@@ -33,7 +39,7 @@ function TaskPage() {
             paddingRight: '0.5rem',
           }}
         >
-          {dummyTasks.map((task, idx) => (
+          {dummyTasks.map((task) => (
             <TaskCard
               key={task.id}
               id={task.id}
@@ -46,6 +52,6 @@ function TaskPage() {
       </div>
     </div>
   );
-}
+};
 
 export default TaskPage;
