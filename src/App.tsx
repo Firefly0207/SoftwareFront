@@ -12,6 +12,7 @@ import Navbar from './components/Navbar';
 import LeaderboardDetail from './pages/LeaderboardDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import NotFound from './components/NotFound';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
