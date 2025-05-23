@@ -51,4 +51,10 @@
   display: none;               /* Chrome, Safari */
 }
 
+/* Loading Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
