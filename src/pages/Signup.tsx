@@ -1,12 +1,14 @@
+// Signup.tsx
+
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { CSSProperties } from 'react';
 
 const Signup: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [team, setTeam] = useState<string>('');
+  const [id, setId] = useState<string>('');           // loginId로 쓰임
+  const [password, setPassword] = useState<string>(''); 
+  const [role, setRole] = useState<string>('USER');   // 기본 역할
   const navigate = useNavigate();
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
@@ -14,10 +16,11 @@ const Signup: React.FC = () => {
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user-info/signup`, {
-        id: team,
-        email,
-        password,
+        loginId: id.trim(),
+        password: password,
+        role: role,
       });
+
       alert('✅ 회원가입 성공');
       console.log('Signup response:', response.data);
       navigate('/login');
@@ -33,16 +36,9 @@ const Signup: React.FC = () => {
       <form onSubmit={handleSignup} style={formStyle}>
         <input
           type="text"
-          placeholder="Team Name"
-          value={team}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setTeam(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          placeholder="Login Id"
+          value={id}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setId(e.target.value)}
           required
         />
         <input
@@ -52,6 +48,14 @@ const Signup: React.FC = () => {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           required
         />
+        <select
+          value={role}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) => setRole(e.target.value)}
+          required
+        >
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
         <button type="submit">Sign Up</button>
       </form>
       <p>Already have an account? <Link to="/login">Login here</Link></p>

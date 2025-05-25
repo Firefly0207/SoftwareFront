@@ -6,40 +6,51 @@ import axios from 'axios';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [email, setEmail] = useState<string>('');
+  const [loginId, setLoginId] = useState<string>('');  // 변경된 변수명
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/user-info/login`, {
-        email,
-        password,
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user-info/login`, {
+        loginId: loginId.trim(),
+        password: password,
       });
-
-      // 로그인 성공 시 로컬 스토리지 및 전역 상태 업데이트
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email.trim());
-      login();
-
-      alert('✅ 로그인 성공!');
-      navigate('/mypage');
+  
+      const res = response.data;
+  
+      if (res.status === 'success' && res.data) {
+        const { token } = res.data;
+  
+        // 로그인 성공 처리 (임시로 userId/teamId null 설정)
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userEmail', loginId.trim());
+        localStorage.setItem('token', token);
+  
+        login(token, '', ''); // userId, teamId는 백엔드 응답에 없음
+  
+        alert('✅ 로그인 성공!');
+        navigate('/mypage');
+      } else {
+        alert(`❌ 로그인 실패: ${res.message || '서버 오류'}`);
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       alert(`❌ 로그인 실패: ${error.response?.data?.message || '오류 발생'}`);
     }
   };
+  
 
   return (
     <div style={{ maxWidth: '400px', margin: 'auto', padding: '2rem' }}>
       <h2>Login</h2>
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Login Id"
+          value={loginId}
+          onChange={(e) => setLoginId(e.target.value)}
           required
         />
         <input
@@ -57,3 +68,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
