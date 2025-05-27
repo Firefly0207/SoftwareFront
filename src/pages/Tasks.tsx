@@ -1,5 +1,6 @@
 import React from 'react';
 import TaskCard from '../components/TaskCard';
+import { useNavigate } from 'react-router-dom';
 
 interface Task {
   id: number;
@@ -16,6 +17,8 @@ const dummyTasks: Task[] = [
 ];
 
 const TaskPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div>
       <div
@@ -40,6 +43,12 @@ const TaskPage: React.FC = () => {
           }}
         >
           {dummyTasks.map((task) => (
+            <div
+              key = {task.id}
+              onClick={() => navigate(`/tasks/${task.id}`)}
+              style = {{ cursor: 'pointer', marginBottom: '1rem' }}
+            >
+
             <TaskCard
               key={task.id}
               id={task.id}
@@ -47,6 +56,7 @@ const TaskPage: React.FC = () => {
               description={task.description}
               dueDate={task.dueDate}
             />
+            </div>
           ))}
         </div>
       </div>
