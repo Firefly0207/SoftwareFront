@@ -13,6 +13,7 @@ import LeaderboardDetail from './pages/LeaderboardDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NotFound from './components/NotFound';
+import AdminPage from './pages/AdminPage';
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/*" element={<NotFound />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
