@@ -13,7 +13,7 @@ import LeaderboardDetail from './pages/LeaderboardDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NotFound from './components/NotFound';
-import AdminPage from './pages/AdminPage';
+import AdminPage from './pages/adminpage';
 
 const App: React.FC = () => {
   return (
