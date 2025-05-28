@@ -8,6 +8,38 @@ spring:
         locator:
           enabled: false
           lowerCaseServiceId: true
+
+      routes:
+        # ✅ REST API 요청용
+        - id: task-service-api
+          uri: http://task-service:8080
+          predicates:
+            - Path=/api/task/**
+          filters:
+            - StripPrefix=1
+
+        # ✅ WebSocket 요청용
+        - id: task-service-ws
+          uri: http://task-service:8080
+          predicates:
+            - Path=/api/ws-progress
+          filters:
+            - StripPrefix=1
+
+        - id: grading-service
+          uri: http://grading-service:8080
+          predicates:
+            - Path=/api/grading/**
+          filters:
+            - StripPrefix=1
+
+        - id: user-info-service
+          uri: http://user-info-server:9004
+          predicates:
+            - Path=/api/user-info/**
+          filters:
+            - StripPrefix=1
+
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -21,6 +53,7 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: true
+
 eureka:
   client:
     register-with-eureka: true
@@ -43,5 +76,5 @@ springdoc:
       - name: USER-SERVER
         url: http://localhost:9004/v3/api-docs
 
-jwt :
+jwt:
   secret: "dF2j8Qx1Vp9!tBrS4l7Ae6Zp3Yw0LmCiOkJrHuZw9@GqVt5NcXh8PuLa2MqDnRoWcSvXbUcZyQnFgLkJt9EzRkBvWaXcYsUqNmTlPoHrGeDbFhQk"

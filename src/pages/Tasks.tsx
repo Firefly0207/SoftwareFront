@@ -1,67 +1,63 @@
-import React from 'react';
-import TaskCard from '../components/TaskCard';
+import React, { useState } from 'react';
+import axios from 'axios';
+import SockJS from 'sockjs-client';
+import { Client, over } from 'stompjs';
 import { useNavigate } from 'react-router-dom';
+import '../styles/Tasks.css';
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  dueDate: string;
-}
-
-const dummyTasks: Task[] = [
-  { id: 1, title: 'Task 1', description: 'short description for task', dueDate: '00d 00h 00m' },
-  { id: 2, title: 'Task 2', description: 'short description for task', dueDate: '01d 03h 20m' },
-  { id: 3, title: 'Task 3', description: 'short description for task', dueDate: '02d 08h 15m' },
-  { id: 4, title: 'Task 4', description: 'short description for task', dueDate: '05d 00h 00m' },
-];
-
-const TaskPage: React.FC = () => {
+const Tasks: React.FC = () => {
+  const [messages, setMessages] = useState<string[]>([]);
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
+  const startTask = async () => {
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/task/start`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log('🚀 작업 시작 요청 성공:', response.data);
+
+      const socket = new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws-progress`);
+      const client = over(socket);
+
+      client.connect({}, () => {
+        console.log('✅ WebSocket 연결 완료');
+
+        client.subscribe(`/topic/task/${token}`, (message) => {
+          const body = JSON.parse(message.body);
+          console.log('📥 수신:', body);
+          setMessages((prev) => [...prev, JSON.stringify(body)]);
+        });
+
+        // ✅ WebSocket 연결 후 라우팅
+        navigate('/tasks/1/submit'); // taskId 실제 값으로 교체
+      });
+
+    } catch (error) {
+      console.error('❌ 작업 시작 실패:', error);
+    }
+  };
+
   return (
-    <div>
-      <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '2rem 1rem',
-        }}
-      >
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Tasks</h2>
+    <div className="tasks-container">
+      <h1>📄 Tasks Page</h1>
+      <button onClick={startTask}>작업 시작</button>
 
-        <div
-          className="scroll-container"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            maxHeight: '500px',
-            overflowY: 'scroll',
-            overflowX: 'hidden',
-            paddingRight: '0.5rem',
-          }}
-        >
-          {dummyTasks.map((task) => (
-            <div
-              key = {task.id}
-              onClick={() => navigate(`/tasks/${task.id}`)}
-              style = {{ cursor: 'pointer', marginBottom: '1rem' }}
-            >
-
-            <TaskCard
-              key={task.id}
-              id={task.id}
-              title={task.title}
-              description={task.description}
-              dueDate={task.dueDate}
-            />
-            </div>
-          ))}
-        </div>
-      </div>
+      <ul>
+        {messages.map((m, i) => <li key={i}>{m}</li>)}
+      </ul>
     </div>
   );
 };
 
-export default TaskPage;
+export default Tasks;

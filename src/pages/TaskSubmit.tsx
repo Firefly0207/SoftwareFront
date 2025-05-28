@@ -1,59 +1,58 @@
-import React, { useState, ChangeEvent } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import SockJS from 'sockjs-client';
+import { Client, over } from 'stompjs';
+import '../styles/TaskSubmit.css';
 
-const TaskSubmitPage: React.FC = () => {
-  const { taskId } = useParams<{ taskId: string }>();
-  const navigate = useNavigate();
-  const [file, setFile] = useState<File | null>(null);
+const TaskSubmit: React.FC = () => {
+  const [results, setResults] = useState<string[]>([]);
+  const token = localStorage.getItem('token');
+  const stompClientRef = useRef<Client | null>(null);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!file) {
-      alert('Please select a file first.');
+  useEffect(() => {
+    if (!token) {
+      console.warn('❗ 토큰이 없습니다. 로그인 후 이용해주세요.');
       return;
     }
 
-    // 실제 제출 로직 추가 가능
-    console.log(`Submitting file: ${file.name}`);
-    navigate('/result');
-  };
+    const socket = new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws-progress`);
+    const client = over(socket);
+
+    client.connect(
+      { Authorization: `Bearer ${token}` },
+      () => {
+        console.log('✅ WebSocket 연결 성공');
+        client.subscribe(`/topic/result/${token}`, (message) => {
+          const body = JSON.parse(message.body);
+          console.log('📥 결과 수신:', body);
+          setResults((prev) => [...prev, JSON.stringify(body)]);
+        });
+      },
+      (error) => {
+        console.error('❌ WebSocket 연결 실패:', error);
+      }
+    );
+
+    stompClientRef.current = client;
+
+    return () => {
+      if (stompClientRef.current?.connected) {
+        stompClientRef.current.disconnect(() => {
+          console.log('🛑 WebSocket 연결 해제 완료');
+        });
+      }
+    };
+  }, [token]);
 
   return (
-    <div>
-      <div style={{ maxWidth: '700px', margin: '2rem auto', textAlign: 'center' }}>
-        <h2>Submit for Task {taskId}</h2>
-        <p>Upload a ZIP file containing your model predictions.</p>
-
-        <input
-          type="file"
-          onChange={handleFileChange}
-          accept=".zip"
-          style={{ margin: '1rem 0' }}
-        />
-        {file && <p>📦 Selected file: {file.name}</p>}
-
-        <button
-          onClick={handleSubmit}
-          style={{
-            marginTop: '1rem',
-            padding: '0.6rem 1.2rem',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Submit
-        </button>
-      </div>
+    <div className="task-submit-container">
+      <h1 className="task-submit-title">📦 Task Submit</h1>
+      <ul className="task-submit-list">
+        {results.map((msg, idx) => (
+          <li key={idx}>{msg}</li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default TaskSubmitPage;
+export default TaskSubmit;
