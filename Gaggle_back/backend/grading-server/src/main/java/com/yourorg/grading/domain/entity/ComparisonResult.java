@@ -17,13 +17,15 @@ public class ComparisonResult {
     private Double psnrAvg;
     private Double ssimAvg;
     private String task;
+    private String days;
 
-    public ComparisonResult(String userId, String requestId, String loginId, Double psnrAvg, Double ssimAvg, String task) {
+    public ComparisonResult(String userId, String requestId, String loginId, Double psnrAvg, Double ssimAvg, String task, String days) {
         this.userId = userId;
         this.requestId = requestId;
         this.loginId = loginId;
         this.psnrAvg = psnrAvg;
         this.ssimAvg = ssimAvg;
         this.task = task;
+        this.days = days;
     }
 }

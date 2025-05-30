@@ -4,6 +4,8 @@ import com.yourorg.leaderboard.port.out.LeaderBoardQueryPort;
 import com.yourorg.leaderboard.domain.entity.LeaderBoard;
 import com.yourorg.leaderboard.adapter.in.dto.LeaderBoardDto;
 import com.yourorg.leaderboard.adapter.out.repository.LeaderBoardMongoRepository;
+import com.yourorg.leaderboard.util.DateUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,7 @@ import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
-public class LeaderBoardJpaAdapter implements LeaderBoardQueryPort {
+public class LeaderBoardMongoAdapter implements LeaderBoardQueryPort {
 
     private final LeaderBoardMongoRepository leaderBoardMongoRepository;
 
@@ -23,12 +25,14 @@ public class LeaderBoardJpaAdapter implements LeaderBoardQueryPort {
     @Override
     public List<LeaderBoardDto> loadLeaderBoardsByTask(String task) {
         List<LeaderBoard> entities = leaderBoardMongoRepository.findByTaskOrderByPsnrAvgDesc(task);
+        
         // 인덱스를 활용해서 순위(1등부터)를 DTO에 매핑
         return IntStream.range(0, entities.size())
                 .mapToObj(i -> {
                     LeaderBoard e = entities.get(i);
                     long rank = i + 1L;
-                    return new LeaderBoardDto(e.getUserId(), e.getPsnrAvg(), e.getTask(), rank);
+                    String days = DateUtils.getDaysAgoString(e.getDays());
+                    return new LeaderBoardDto(e.getLoginId(), e.getPsnrAvg(), e.getSsimAvg(), e.getTask(), rank, days);
                 })
                 .collect(Collectors.toList());
     }
@@ -41,8 +45,9 @@ public class LeaderBoardJpaAdapter implements LeaderBoardQueryPort {
                 .filter(i -> entities.get(i).getUserId().equals(userId))
                 .mapToObj(i -> {
                     LeaderBoard e = entities.get(i);
+                    String days = DateUtils.getDaysAgoString(e.getDays());
                     long rank = i + 1L;
-                    return new LeaderBoardDto(e.getUserId(), e.getPsnrAvg(), e.getTask(), rank);
+                    return new LeaderBoardDto(e.getLoginId(), e.getPsnrAvg(), e.getSsimAvg(), e.getTask(), rank, days);
                 })
                 .findFirst();
         return result.map(List::of).orElse(Collections.emptyList());

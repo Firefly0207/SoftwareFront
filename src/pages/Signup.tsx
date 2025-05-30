@@ -1,4 +1,5 @@
 // Signup.tsx
+/// <reference types="vite/client" />
 
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

@@ -17,6 +17,8 @@ public class LeaderBoard {
     @Indexed(unique = true)
     private String loginId;
     private Double psnrAvg;
+    private Double ssimAvg;
     private String task;
     private Long rank;
+    private String days;
 }

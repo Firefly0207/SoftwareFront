@@ -9,6 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // ✅ 기본 생성자도 추가
 public class LoginResponsedto {
     private String token;
-    private String userId;  // ✅ 추가
-    private String teamId;  // ✅ 추가
 }

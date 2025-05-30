@@ -4,8 +4,10 @@
 export interface LeaderboardEntry {
     loginId: string;
     psnrAvg: number;
+    ssimAvg: number;
     task: string;
     rank: number;
+    days : string;
 }
 
 export interface LeaderboardResponse {
