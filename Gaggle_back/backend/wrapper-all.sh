@@ -2,7 +2,7 @@
 set -eu  # 에러 발생 시 즉시 중단, 미정의 변수 사용 시 중단
 
 # 서버 디렉터리 목록
-SERVERS="api-gateway eureka-server crawling-server article-server quiz-server strike-server summary-server user-info-server"
+SERVERS="api-gateway eureka-server grading-server leaderboard-server user-server"
 
 for dir in $SERVERS; do
     echo "========================="

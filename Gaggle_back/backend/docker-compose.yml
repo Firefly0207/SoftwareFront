@@ -62,7 +62,6 @@ services:
       - EUREKA_SERVER=http://eureka-server:8761/eureka/
     networks:
       - backend
-
   # ========== 백엔드 서비스: 몽고DB 이용 ==========
   comparision-server:
     build: ./comparision-server

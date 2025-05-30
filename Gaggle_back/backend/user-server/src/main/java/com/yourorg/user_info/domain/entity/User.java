@@ -21,10 +21,4 @@ public class User {
     private String loginId;
     private String password; // 비밀번호 필드
     private String role;
-
-    public User(String loginId, String password, String role) {
-        this.loginId = loginId;
-        this.password = password;
-        this.role = role;
-    }
 }

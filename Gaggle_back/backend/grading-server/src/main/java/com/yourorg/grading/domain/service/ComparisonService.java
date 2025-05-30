@@ -60,4 +60,9 @@ public class ComparisonService implements ComparisonPort, ComparisonSavePort, Pr
     public void sendTaskStatus(String token, OurApiResponse<Map<String, Object>> taskResult) {
         taskConsumerPort.sendTaskStatus(token, taskResult);
     }
+
+    @Override
+    public void saveTask(String token, String taskName) {
+        comparisionMongoPort.saveTaskRepository(token, taskName);
+    }
 }

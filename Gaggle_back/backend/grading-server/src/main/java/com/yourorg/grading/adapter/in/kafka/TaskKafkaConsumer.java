@@ -35,5 +35,6 @@ public class TaskKafkaConsumer {
                 new OurApiResponse<>(status, task, null);
 
         taskPublisherPort.sendTaskStatus(token, response);
+        taskPublisherPort.saveTask(token, taskName);
     }
 }

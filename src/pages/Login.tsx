@@ -25,7 +25,7 @@ const Login: React.FC = () => {
   
         // 로그인 성공 처리 (임시로 userId/teamId null 설정)
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', loginId.trim());
+        localStorage.setItem('loginId', loginId.trim());
         localStorage.setItem('token', token);
   
         login(token, '', ''); // userId, teamId는 백엔드 응답에 없음
