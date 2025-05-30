@@ -26,6 +26,7 @@ const Signup: React.FC = () => {
       console.log('Signup response:', response.data);
       navigate('/login');
     } catch (error: any) {
+      console.log(error);
       console.error('Signup error:', error);
       alert(`❌ 회원가입 실패: ${error.response?.data?.message || '오류 발생'}`);
     }
