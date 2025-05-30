@@ -24,9 +24,8 @@ public class JwtAuthorizationFilter implements GlobalFilter, Ordered {
         "/api/public/",         // 공개 API
         "/api/user-info/login", // 로그인
         "/api/user-info/signup",// 회원가입
-        "/api/task/",           // Task API 인증 예외 추가
         "/health",              // 헬스체크
-        "/actuator/health",     // 헬스체크
+        "/actuator/health",      // 헬스체크
         "/webjars/swagger-ui/index.html",
         "/swagger-ui/index.html"
     };

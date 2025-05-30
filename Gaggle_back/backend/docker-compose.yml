@@ -63,15 +63,6 @@ services:
     networks:
       - backend
 
-  task-service:
-    build: ./task-service
-    container_name: task-service
-    ports:
-      - "8081:8080"
-    networks:
-      - backend
-
-
   # ========== 백엔드 서비스: 몽고DB 이용 ==========
   comparision-server:
     build: ./comparision-server

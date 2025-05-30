@@ -46,8 +46,9 @@ public class AuthService implements AuthPort {
         }
         String token = jwtProvider.generateToken(user.getUserId(), user.getRole());
 
-        // ✅ 전체 정보 포함해서 리턴
-        return new LoginResponsedto(token, user.getUserId(), user.getTeamId());
-    }
+        LoginResponsedto dto = new LoginResponsedto(token);
 
+        // JWT 토큰 발급
+        return dto;
+    }
 }
