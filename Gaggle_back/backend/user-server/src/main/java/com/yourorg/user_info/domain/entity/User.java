@@ -14,15 +14,17 @@ import org.springframework.data.mongodb.core.index.Indexed;
 @NoArgsConstructor
 @Document(collection = "user")
 public class User {
+
     @Id
     private String userId;
-
     @Indexed(unique = true)
     private String loginId;
-
-    private String password;
+    private String password; // 비밀번호 필드
     private String role;
 
-    private String teamId; // ✅ 추가
+    public User(String loginId, String password, String role) {
+        this.loginId = loginId;
+        this.password = password;
+        this.role = role;
+    }
 }
-
