@@ -32,7 +32,9 @@ public class PsnrKafkaConsumer {
         int current = progress.get("current") != null ? ((Number)progress.get("current")).intValue() : -1;
         int total = progress.get("total") != null ? ((Number)progress.get("total")).intValue() : -1;
         String filename = (String) progress.get("filename");
-
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         log.info("[Progress] token = {}requestId={} loginId={} task={} {}/{} filename={} status={}",
                 token, requestId, loginId, task, current, total, filename);
 
@@ -57,7 +59,9 @@ public class PsnrKafkaConsumer {
         String task = (String) result.get("task");
         // 1. DB 저장
         comparisionSavePort.saveResult(userId, requestId, loginId, psnrAvg, ssimAvg, task);
-
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         // 2. OurApiResponse 래핑용 status/message
         String statusStr;
         String messageText = null;

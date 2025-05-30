@@ -1,61 +1,142 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import axios from 'axios';
 import SockJS from 'sockjs-client';
-import { Client, over } from 'stompjs';
-import { useNavigate } from 'react-router-dom';
+import { Client } from '@stomp/stompjs';
+import TaskSubmitModal from '../components/TaskSubmitModal';
 import '../styles/Tasks.css';
 
 const Tasks: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [waitingForTaskResult, setWaitingForTaskResult] = useState(false);
+  const [taskResult, setTaskResult] = useState<any>(null);
   const token = localStorage.getItem('token');
-  const navigate = useNavigate();
 
-  const startTask = async () => {
+  const stompClientRef = useRef<Client | null>(null);
+
+  const startTask = () => {
     if (!token) {
       alert('로그인이 필요합니다.');
       return;
     }
+    setModalOpen(true);
+    setTaskResult(null);
+    setMessages([]);
+  };
 
+  const submitTaskFile = async (file: File, task: string) => {
+    if (!token) {
+      alert('로그인 필요');
+      return;
+    }
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/task/start`,
-        {},
+      setWaitingForTaskResult(true);
+      setTaskResult(null);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('task', task);
+
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/grading/task`,
+        formData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
+      setModalOpen(false);
 
-      console.log('🚀 작업 시작 요청 성공:', response.data);
+      subscribeTaskWebSocket(token);
 
-      const socket = new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws-progress`);
-      const client = over(socket);
-
-      client.connect({}, () => {
-        console.log('✅ WebSocket 연결 완료');
-
-        client.subscribe(`/topic/task/${token}`, (message) => {
-          const body = JSON.parse(message.body);
-          console.log('📥 수신:', body);
-          setMessages((prev) => [...prev, JSON.stringify(body)]);
-        });
-
-        // ✅ WebSocket 연결 후 라우팅
-        navigate('/tasks/1/submit'); // taskId 실제 값으로 교체
-      });
-
-    } catch (error) {
-      console.error('❌ 작업 시작 실패:', error);
+    } catch (e) {
+      alert('파일 제출 실패');
+      setWaitingForTaskResult(false);
     }
   };
 
+  const subscribeTaskWebSocket = (token: string) => {
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+      stompClientRef.current = null;
+    }
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS('/ws-progress'),
+      reconnectDelay: 5000,
+      debug: (str) => console.log('[STOMP]', str),
+      onConnect: () => {
+        client.subscribe(`/topic/task/${token}`, (message) => {
+          setWaitingForTaskResult(false);
+          setTaskResult(message.body);
+          setMessages(prev => [...prev, message.body]);
+        });
+      },
+      onStompError: (frame) => {
+        setWaitingForTaskResult(false);
+        alert('WebSocket STOMP 에러: ' + frame.headers['message']);
+      },
+      onWebSocketError: (event) => {
+        setWaitingForTaskResult(false);
+        alert('WebSocket 연결 실패');
+      },
+      onDisconnect: () => {
+        stompClientRef.current = null;
+      }
+    });
+
+    stompClientRef.current = client;
+    client.activate();
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+        stompClientRef.current = null;
+      }
+    };
+  }, []);
+
+  // 성공 메시지 파싱
+  let showSuccess = false;
+  if (taskResult) {
+    try {
+      const resultObj = typeof taskResult === 'string' ? JSON.parse(taskResult) : taskResult;
+      const status = resultObj.status || (resultObj.data && resultObj.data.status) || '';
+      showSuccess = status === 'success';
+    } catch (e) {
+      showSuccess = false;
+    }
+  }
+
   return (
     <div className="tasks-container">
-      <h1>📄 Tasks Page</h1>
-      <button onClick={startTask}>작업 시작</button>
+      <h1 className="tasks-title">📄 Tasks Page</h1>
+      <div className="tasks-action-row">
+        <button className="tasks-button" onClick={startTask}>
+          Task Dataset Register
+        </button>
+        {showSuccess && (
+          <span style={{ color: 'green', fontWeight: 'bold', fontSize: '1.1rem' }}>
+            success
+          </span>
+        )}
+      </div>
 
-      <ul>
-        {messages.map((m, i) => <li key={i}>{m}</li>)}
-      </ul>
+      {waitingForTaskResult && (
+        <div className="task-waiting">
+          <p>⏳ Waiting for registering task dataset...</p>
+        </div>
+      )}
+
+      <TaskSubmitModal
+        show={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={submitTaskFile}
+        taskInfo={null}
+      />
     </div>
   );
 };

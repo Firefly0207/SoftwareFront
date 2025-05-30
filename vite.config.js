@@ -1,10 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  define: {
-    global: {}, // ✅ 여기가 핵심
-  },
+  define: { global: {} },
+  server: {
+    proxy: {
+      '/ws-progress': {
+        target: 'http://localhost:9002',
+        ws: true,
+        changeOrigin: true,
+      }
+    }
+  }
 })

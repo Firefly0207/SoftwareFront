@@ -121,6 +121,9 @@ def process_zip_message(message):
                     ssim = calculate_ssim(user_img, ref_img)
                     print(f" - PSNR 계산값: {psnr}")
                     print(f" - SSIM 계산값: {ssim}")
+
+                    tume.sleep(0.5)
+
             except Exception as e:
                 psnr = None
                 print(f" - [에러] PSNR 계산 중 에러: {e}")

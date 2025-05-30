@@ -27,7 +27,7 @@ public class JwtAuthorizationFilter implements GlobalFilter, Ordered {
         "/health",              // 헬스체크
         "/actuator/health",      // 헬스체크
         "/webjars/swagger-ui/index.html",
-        "/swagger-ui/index.html"
+        "/swagger-ui/index.html",
     };
 
     private boolean isIgnored(String path) {
