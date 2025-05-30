@@ -1,78 +1,95 @@
-import React from 'react';
+/// <reference types="vite/client" />
 
-interface Submission {
+import React, { useEffect, useState } from 'react';
+
+interface MyUserEntry {
+  loginId: string;
+  psnrAvg: number;
+  ssimAvg: number;
   task: string;
-  score: number;
   rank: number;
-  entries: number;
-  last: string;
+  days: string;
 }
 
-interface User {
-  team: string;
-  totalSubmissions: number;
-  averageScore: number;
-  bestRank: number;
+interface MyUserApiResponse {
+  status: 'success' | 'fail';
+  data: MyUserEntry[];
+  message: string | null;
 }
 
 const MyPage: React.FC = () => {
-  const user: User = {
-    team: 'Team Z',
-    totalSubmissions: 12,
-    averageScore: 0.8432,
-    bestRank: 2,
-  };
+  const [records, setRecords] = useState<MyUserEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const submissionHistory: Submission[] = [
-    { task: 'Task 1', score: 0.9123, rank: 3, entries: 5, last: '3 days ago' },
-    { task: 'Task 2', score: 0.8231, rank: 5, entries: 2, last: '1 week ago' },
-    { task: 'Task 3', score: 0.7555, rank: 9, entries: 1, last: '2 weeks ago' },
-    // ... 필요시 추가
-  ];
+  const token = localStorage.getItem('token') || '';
+
+  useEffect(() => {
+    // API 호출 함수
+    const fetchUserLeaderboard = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/leaderboard/user`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        const json: MyUserApiResponse = await res.json();
+        if (json.status === 'success') {
+          setRecords(json.data);
+        } else {
+          setError(json.message || '데이터를 불러오지 못했습니다.');
+        }
+      } catch (err: any) {
+        setError('네트워크 오류 또는 서버 오류');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserLeaderboard();
+  }, [token]);
 
   return (
-    <div>
-      <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '1rem' }}>
-        <h2 style={{ textAlign: 'center' }}>My Page</h2>
+    <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '1rem' }}>
+      <h2 style={{ textAlign: 'center' }}>My Page (User Record)</h2>
 
-        <div
-          style={{
-            backgroundColor: '#f9f9f9',
-            padding: '1rem',
-            borderRadius: '8px',
-            marginBottom: '2rem',
-          }}
-        >
-          <p><strong>Team:</strong> {user.team}</p>
-          <p><strong>Total Submissions:</strong> {user.totalSubmissions}</p>
-          <p><strong>Average Score:</strong> {user.averageScore.toFixed(4)}</p>
-          <p><strong>Best Rank:</strong> {user.bestRank}</p>
-        </div>
+      {loading && <p style={{ textAlign: 'center' }}>불러오는 중...</p>}
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
 
-        <h3>Submission History</h3>
-        <table className="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Score</th>
-              <th>Rank</th>
-              <th>Entries</th>
-              <th>Last Submission</th>
-            </tr>
-          </thead>
-          <tbody>
-            {submissionHistory.map((row, index) => (
-              <tr key={index}>
-                <td>{row.task}</td>
-                <td>{row.score}</td>
-                <td>{row.rank}</td>
-                <td>{row.entries}</td>
-                <td>{row.last}</td>
+      <table className="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>PSNR</th>
+            <th>SSIM</th>
+            <th>Rank</th>
+            <th>Last</th>
+          </tr>
+        </thead>
+        <tbody>
+          {records.length > 0 ? (
+            records.map((entry, idx) => (
+              <tr key={entry.task + '-' + entry.rank}>
+                <td>{entry.task}</td>
+                <td>{entry.psnrAvg?.toFixed(2) ?? '-'}</td>
+                <td>{entry.ssimAvg?.toFixed(2) ?? '-'}</td>
+                <td>{entry.rank}</td>
+                <td>{entry.days}</td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            !loading && (
+              <tr>
+                <td colSpan={5} style={{ textAlign: 'center', color: '#aaa' }}>
+                  No records found.
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

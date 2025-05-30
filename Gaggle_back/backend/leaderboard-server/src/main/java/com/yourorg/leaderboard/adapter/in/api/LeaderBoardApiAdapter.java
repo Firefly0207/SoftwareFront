@@ -154,12 +154,10 @@ public class LeaderBoardApiAdapter {
     })
     @GetMapping("/user")
     public ResponseEntity<OurApiResponse<List<LeaderBoardDto>>> getLeaderBoardByUser(
-            @RequestHeader("Authorization") String token,
-            @RequestParam("task") String task) {
+            @RequestHeader("Authorization") String token) {
 
         JwtUserInfoDto userInfo = JwtUtil.getUserInfoFromToken(token.replace("Bearer ", ""), secretKey);
-
-        List<LeaderBoardDto> dto = leaderBoardPort.getLeaderBoardByUser(userInfo.getUserId(), task);
+        List<LeaderBoardDto> dto = leaderBoardPort.getLeaderBoardByUser(userInfo.getUserId());
 
         if (dto == null || dto.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

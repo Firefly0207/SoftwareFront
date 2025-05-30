@@ -26,6 +26,22 @@ interface WebSocketBaseData {
     task: string;
 }
 
+export interface MyUserEntry {
+    loginId: string;
+    psnrAvg: number;
+    ssimAvg: number;
+    task: string;
+    rank: number;
+    days: string;
+  }
+  
+  export interface MyUserApiResponse {
+    status: 'success' | 'fail';
+    data: MyUserEntry[];
+    message: string | null;
+  }
+  
+
 /**
  * Grading 관련 메시지
  */

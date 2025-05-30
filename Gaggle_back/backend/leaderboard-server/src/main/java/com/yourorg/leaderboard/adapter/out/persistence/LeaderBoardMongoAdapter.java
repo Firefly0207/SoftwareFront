@@ -41,15 +41,26 @@ public class LeaderBoardMongoAdapter implements LeaderBoardQueryPort {
     @Override
     public List<LeaderBoardDto> loadLeaderBoardsByUserAndTask(String userId, String task) {
         List<LeaderBoard> entities = leaderBoardMongoRepository.findByTaskOrderByPsnrAvgDesc(task);
-        Optional<LeaderBoardDto> result = IntStream.range(0, entities.size())
-                .filter(i -> entities.get(i).getUserId().equals(userId))
+
+        return IntStream.range(0, entities.size())
+                .filter(i -> {
+                    String dbUserId = entities.get(i).getUserId();
+                    return dbUserId != null && dbUserId.equals(userId);
+                })
                 .mapToObj(i -> {
                     LeaderBoard e = entities.get(i);
-                    String days = DateUtils.getDaysAgoString(e.getDays());
                     long rank = i + 1L;
-                    return new LeaderBoardDto(e.getLoginId(), e.getPsnrAvg(), e.getSsimAvg(), e.getTask(), rank, days);
+                    String days = DateUtils.getDaysAgoString(e.getDays());
+                    return new LeaderBoardDto(
+                        e.getLoginId(),
+                        e.getPsnrAvg(),
+                        e.getSsimAvg(),
+                        e.getTask(),
+                        rank,
+                        days
+                    );
                 })
-                .findFirst();
-        return result.map(List::of).orElse(Collections.emptyList());
+                .limit(5) // ★ 최대 5개만 반환
+                .collect(Collectors.toList());
     }
 }
