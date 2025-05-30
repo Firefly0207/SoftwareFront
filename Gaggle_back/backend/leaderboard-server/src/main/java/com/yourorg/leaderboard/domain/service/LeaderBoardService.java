@@ -8,6 +8,8 @@ import com.yourorg.leaderboard.port.in.TaskRequestPort;
 import com.yourorg.leaderboard.port.out.TaskQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,12 +28,17 @@ public class LeaderBoardService implements LeaderBoardPort, TaskRequestPort {
     }
 
     @Override
-    public List<LeaderBoardDto> getLeaderBoardByUser(String userId, String task) {
-        List<LeaderBoardDto> boards = leaderBoardQueryPort.loadLeaderBoardsByTask(task);
-        return boards.stream()
-            .map(lb -> new LeaderBoardDto(lb.getLoginId(), lb.getPsnrAvg(),lb.getSsimAvg(), task, lb.getRank(), lb.getDays()))
-            .collect(Collectors.toList());
+    public List<LeaderBoardDto> getLeaderBoardByUser(String userId) {
+        List<TaskListDto> taskList = taskQueryPort.loadTaskList();
+        List<LeaderBoardDto> result = new ArrayList<>();
+        for (TaskListDto taskDto : taskList) {
+            String task = taskDto.getTask();
+            List<LeaderBoardDto> boards = leaderBoardQueryPort.loadLeaderBoardsByUserAndTask(userId, task);
+            result.addAll(boards);
+        }
+        return result;
     }
+
 
     @Override
     public List<TaskListDto>  getTaskList() {

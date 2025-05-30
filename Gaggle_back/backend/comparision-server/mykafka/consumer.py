@@ -6,7 +6,7 @@ import shutil
 import cv2
 from kafka import KafkaConsumer
 from mykafka.producer import send_progress, send_result  # 앞서 만든 producer 함수 import
-from utils import calculate_psnr
+from utils import calculate_psnr, calculate_ssim
 
 UPLOAD_FOLDER = './uploads'
 TEMP_FOLDER = './temp'

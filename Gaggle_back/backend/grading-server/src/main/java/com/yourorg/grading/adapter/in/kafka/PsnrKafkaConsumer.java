@@ -55,7 +55,6 @@ public class PsnrKafkaConsumer {
         Double psnrAvg = result.get("psnrAvg") != null ? ((Number)result.get("psnrAvg")).doubleValue() : null;
         Double ssimAvg = result.get("ssimAvg") != null ? ((Number)result.get("ssimAvg")).doubleValue() : null;
         String task = (String) result.get("task");
-        
         // 1. DB 저장
         comparisionSavePort.saveResult(userId, requestId, loginId, psnrAvg, ssimAvg, task);
 

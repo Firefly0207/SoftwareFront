@@ -20,7 +20,6 @@ public class ComparisonMongoAdapter implements ComparisonMongoPort {
     public void saveResultJPA(String userId, String requestId, String loginId, Double psnrAvg, Double ssimAvg, String task) {
         String days = Instant.now().toString();
         ComparisonResult result = new ComparisonResult(userId, requestId, loginId, psnrAvg, ssimAvg, task, days);
-        System.out.println(loginId + "@@@@@@@@@@@@@@@@@@@@@@@@@");
         comparisionResultRepository.save(result);
     }
 

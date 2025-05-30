@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface LeaderBoardPort {
     List<LeaderBoardDto> getLeaderBoardsByTask(String task);
-    List<LeaderBoardDto> getLeaderBoardByUser(String userId, String task);
+    List<LeaderBoardDto> getLeaderBoardByUser(String userId);
 }

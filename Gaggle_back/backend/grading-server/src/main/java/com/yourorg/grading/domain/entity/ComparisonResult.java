@@ -10,10 +10,10 @@ import lombok.*;
 @Document(collection = "comparision_results")
 public class ComparisonResult {
     @Id
+    private String requestId;
     private String userId;
     private String token;
     private String loginId;
-    private String requestId;
     private Double psnrAvg;
     private Double ssimAvg;
     private String task;
