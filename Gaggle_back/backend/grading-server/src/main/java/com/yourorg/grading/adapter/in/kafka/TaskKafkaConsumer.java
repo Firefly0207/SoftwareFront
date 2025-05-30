@@ -29,7 +29,9 @@ public class TaskKafkaConsumer {
         String taskName = (String) task.get("task");
         String status = (String) task.get("status");
         log.info("[Task] requestId={} loginId={} task={}", requestId, loginId, taskName);
-        
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         // 1. OurApiResponse로 감싸서 프론트에 전달
         OurApiResponse<Map<String, Object>> response =
                 new OurApiResponse<>(status, task, null);
