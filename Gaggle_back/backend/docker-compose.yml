@@ -71,6 +71,10 @@ services:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./comparision-server/static:/app/static
+      - ./comparision-server/uploads:/app/uploads
+      - ./comparision-server/temp:/app/temp
     networks:
       - backend
 

@@ -23,6 +23,7 @@ const Navbar: React.FC = () => {
       <div className="navbar-center">
         <Link to="/" className="navbar-link">Home</Link>
         <Link to="/tasks" className="navbar-link">Tasks</Link>
+        <Link to="/grading" className="navbar-link">Grading</Link>
         <Link to="/leaderboard" className="navbar-link">Leaderboard</Link>
       </div>
 

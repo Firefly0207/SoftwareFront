@@ -31,7 +31,29 @@ const LeaderboardDetail: React.FC = () => {
         );
         const json: LeaderboardResponse = await res.json();
         if (json.status === 'success') {
-          setEntries(json.data);
+          // 중복된 사용자의 최고 점수만 선택
+          const uniqueEntries = json.data.reduce((acc: LeaderboardEntry[], current) => {
+            const existingEntry = acc.find(entry => entry.loginId === current.loginId);
+            if (!existingEntry || current.psnrAvg > existingEntry.psnrAvg) {
+              // 기존 항목이 있으면 제거
+              if (existingEntry) {
+                acc = acc.filter(entry => entry.loginId !== current.loginId);
+              }
+              acc.push(current);
+            }
+            return acc;
+          }, []);
+
+          // PSNR 점수 기준으로 내림차순 정렬
+          const sortedEntries = uniqueEntries.sort((a, b) => b.psnrAvg - a.psnrAvg);
+          
+          // 랭크 재계산
+          const rankedEntries = sortedEntries.map((entry, index) => ({
+            ...entry,
+            rank: index + 1
+          }));
+
+          setEntries(rankedEntries);
         } else {
           setError(json.message || '리더보드 데이터를 불러오지 못했습니다.');
         }
@@ -45,8 +67,8 @@ const LeaderboardDetail: React.FC = () => {
     fetchTaskLeaderboard();
   }, [taskId, token]);
 
-  // 점수 기준 내림차순 정렬
-  const sorted = [...entries].sort((a, b) => b.psnrAvg - a.psnrAvg);
+  // 정렬된 entries 사용 (이미 정렬되어 있으므로 추가 정렬 불필요)
+  const sorted = entries;
 
   // 내 팀(유저) 하이라이트
   const myTeamIndex = sorted.findIndex((e) => e.loginId === myLoginId);

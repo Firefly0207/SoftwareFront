@@ -4,6 +4,7 @@ import zipfile
 import uuid
 import shutil
 import cv2
+import math
 from kafka import KafkaConsumer
 from mykafka.producer import send_progress, send_result  # 앞서 만든 producer 함수 import
 from utils import calculate_psnr, calculate_ssim
@@ -102,6 +103,7 @@ def process_zip_message(message):
     totalSSIM = 0
     psnr = None
     ssim = None
+    valid_psnr_count = 0  # inf가 아닌 PSNR 값의 개수
     for idx, fname in enumerate(file_list, start=1):
         user_img_path = os.path.join(extract_file, fname)
         ref_img_path = os.path.join(reference_task_folder, fname)
@@ -122,7 +124,7 @@ def process_zip_message(message):
                     print(f" - PSNR 계산값: {psnr}")
                     print(f" - SSIM 계산값: {ssim}")
 
-                    tume.sleep(0.5)
+                    time.sleep(0.5)
 
             except Exception as e:
                 psnr = None
@@ -134,12 +136,17 @@ def process_zip_message(message):
             print(" - [경고] 기준 이미지 없음, 진행 상황 전송 (psnr=None)")
         
         if psnr is not None:
-            totalPSNR += psnr
+            if math.isinf(psnr):
+                totalPSNR += 100.0  # inf 대신 100을 사용 (매우 높은 PSNR 값)
+            else:
+                totalPSNR += psnr
+            valid_psnr_count += 1
 
         if ssim is not None:
             totalSSIM += ssim
 
-    avgPSNR = totalPSNR / total
+    # 유효한 PSNR 값이 있는 경우에만 평균 계산
+    avgPSNR = totalPSNR / valid_psnr_count if valid_psnr_count > 0 else 0
     avgSSIM = totalSSIM / total
 
     # --- 최종 결과 메시지 전송 ---

@@ -14,28 +14,34 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NotFound from './components/NotFound';
 import AdminPage from './pages/adminpage';
-
+import Grading from './pages/Grading';
+import { ResultProvider } from './contexts/ResultContext';
+import AppRoutes from './AppRoutes';
+import './App.css';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
-          <Route path="/tasks/:taskId/submit" element={<TaskSubmitPage />} />
-          <Route path="/result" element={<Result />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/leaderboard/:taskId" element={<LeaderboardDetail />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/*" element={<NotFound />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Routes>
-      </BrowserRouter>
+      <ResultProvider>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
+            <Route path="/tasks/:taskId/submit" element={<TaskSubmitPage />} />
+            <Route path="/result" element={<Result />} />
+            <Route path="/grading" element={<Grading />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/leaderboard/:taskId" element={<LeaderboardDetail />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/*" element={<NotFound />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Routes>
+        </BrowserRouter>
+      </ResultProvider>
     </AuthProvider>
   );
 };
