@@ -21,8 +21,8 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
-        configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 104857600); // 100MB
-        configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 134217728);    // 128MB
+        configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 524288000); // 100MB
+        configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 524288000);    // 128MB
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -42,8 +42,8 @@ public class KafkaConfig {
         props.put("spring.deserializer.value.delegate.class", "org.springframework.kafka.support.serializer.JsonDeserializer");
         props.put("spring.json.trusted.packages", "com.yourorg.*");
         props.put("spring.json.value.default.type", "com.yourorg.grading.adapter.out.dto.SendRequestDto");
-        props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 104857600);
-        props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 104857600);
+        props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 524288000);
+        props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 524288000);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 }

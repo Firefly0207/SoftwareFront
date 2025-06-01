@@ -1,42 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SubmitModal from '../components/SubmitModal';
 import '../styles/Grading.css';
 
 interface Task {
   task: string;
 }
-
-interface SubmitModalProps {
-  isOpen: boolean;
-  task: string;
-  onClose: () => void;
-  onGoToLeaderboard: () => void;
-}
-
-const SubmitModal: React.FC<SubmitModalProps> = ({ isOpen, task, onClose, onGoToLeaderboard }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h3>제출 완료</h3>
-        <p>{task} 태스크에 대한 제출이 완료되었습니다.</p>
-        <p>리더보드에서 결과를 확인하실 수 있습니다.</p>
-        <div className="info-message">
-          <p><i>* 리더보드 갱신에는 약 3-5분 정도 소요될 수 있습니다.</i></p>
-        </div>
-        <div className="modal-buttons">
-          <button onClick={onGoToLeaderboard} className="primary-button">
-            리더보드에서 결과 보기
-          </button>
-          <button onClick={onClose} className="secondary-button">
-            추가 제출하기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Grading: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -48,7 +17,17 @@ const Grading: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token') || '';
 
+  // 1. 토큰 없으면 에러 표시 및 로그인 페이지 유도(선택)
   useEffect(() => {
+    if (!token) {
+      setError('로그인이 필요합니다.');
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
+    // 토큰이 없으면 tasks를 가져오지 않음
+    if (!token) return;
     const fetchTasks = async () => {
       try {
         setLoading(true);
@@ -82,11 +61,14 @@ const Grading: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      setError('로그인이 필요합니다.');
+      return;
+    }
     if (!selectedTask || !file) {
       setError('태스크와 파일을 모두 선택해주세요.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('task', selectedTask);
@@ -94,7 +76,7 @@ const Grading: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/grading`, {
         method: 'POST',
         headers: {
@@ -131,18 +113,20 @@ const Grading: React.FC = () => {
       <h2>Grading</h2>
       {loading && <p>처리 중...</p>}
       {error && <p className="error-message">{error}</p>}
-      
+
+      {/* 토큰 없으면 폼 비활성화 */}
       <form onSubmit={handleSubmit} className="grading-form">
         <div className="form-group">
           <label htmlFor="task">Task 선택:</label>
           <select
             id="task"
             value={selectedTask}
-            onChange={(e) => setSelectedTask(e.target.value)}
+            onChange={e => setSelectedTask(e.target.value)}
             required
+            disabled={!token}
           >
             <option value="">태스크를 선택하세요</option>
-            {tasks.map((t) => (
+            {tasks.map(t => (
               <option key={t.task} value={t.task}>
                 {t.task}
               </option>
@@ -158,12 +142,11 @@ const Grading: React.FC = () => {
             accept=".zip"
             onChange={handleFileChange}
             required
+            disabled={!token}
           />
         </div>
 
-        <button type="submit" disabled={loading}>
-          제출하기
-        </button>
+        <button type="submit" disabled={loading || !token}>제출하기</button>
       </form>
 
       <SubmitModal
@@ -176,4 +159,4 @@ const Grading: React.FC = () => {
   );
 };
 
-export default Grading; 
+export default Grading;
