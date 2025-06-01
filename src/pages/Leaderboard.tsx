@@ -43,39 +43,27 @@ const Leaderboard: React.FC = () => {
 
   return (
     <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h2>Task 목록</h2>
+      <h2 style={{
+        fontWeight: 700, 
+        fontSize: '2rem', 
+        letterSpacing: '-0.01em', 
+        marginBottom: '1.6rem'
+      }}>
+        Task 목록
+      </h2>
       {loading && <p>불러오는 중...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
+      <div className="task-card-list">
         {tasks.map((t) => (
           <button
-          key={t.task}
-          style={{
-            padding: '0.85rem 1.7rem',
-            fontSize: '1rem',
-            borderRadius: '6px',
-            background: '#fafbfc',
-            border: '1px solid #cfd8dc',
-            color: '#222',
-            cursor: 'pointer',
-            marginBottom: '0.5rem',
-            marginRight: '0.5rem',
-            transition: 'background 0.15s, border 0.15s',
-            boxShadow: '0 1px 2px rgba(60,60,60,0.03)'
-          }}
-          onMouseOver={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#f1f3f4';
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid #b0bec5';
-          }}
-          onMouseOut={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#fafbfc';
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid #cfd8dc';
-          }}
-          onClick={() => navigate(`/leaderboard/${t.task}`)}
-        >
-          {t.task}
-        </button>
-        
+            key={t.task}
+            className="task-card"
+            onClick={() => navigate(`/leaderboard/${t.task}`)}
+            type="button"
+          >
+            {/* 아이콘 예시: <span style={{marginRight:'0.5rem'}}>🗂️</span> */}
+            {t.task}
+          </button>
         ))}
       </div>
     </div>

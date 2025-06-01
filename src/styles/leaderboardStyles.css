@@ -49,3 +49,61 @@
   }
 }
 
+.task-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.task-card {
+  min-width: 130px;
+  padding: 1.1rem 1.8rem;
+  font-size: 1.05rem;
+  border-radius: 16px;
+  background: #fff;
+  border: none;
+  color: #374151;
+  box-shadow: 0 2px 8px rgba(120,140,180,0.10);
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: 
+    box-shadow 0.18s cubic-bezier(.55,.09,.68,.53),
+    transform 0.19s,
+    background 0.15s,
+    color 0.14s;
+  outline: none;
+  position: relative;
+  border: 1px solid #e3e6ee;
+}
+
+.task-card:hover, .task-card:focus {
+  box-shadow: 0 4px 20px rgba(30,40,80,0.14);
+  background: #e6f2ff;
+  color: #0073e6;
+  transform: translateY(-4px) scale(1.04);
+  border: 1.5px solid #b3d4fc;
+}
+
+@media (max-width: 900px) {
+  .task-card {
+    min-width: 110px;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.98rem;
+  }
+}
+@media (max-width: 600px) {
+  .task-card-list {
+    gap: 0.60rem;
+  }
+  .task-card {
+    min-width: 85px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.93rem;
+    border-radius: 12px;
+  }
+}

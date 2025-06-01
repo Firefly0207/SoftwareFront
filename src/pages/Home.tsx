@@ -9,7 +9,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate('/tasks');
+    navigate('/grading');
   };
 
   const steps = [

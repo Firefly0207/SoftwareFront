@@ -10,6 +10,7 @@ const Tasks: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [waitingForTaskResult, setWaitingForTaskResult] = useState(false);
   const [taskResult, setTaskResult] = useState<any>(null);
+  const [permissionError, setPermissionError] = useState<string>(''); // 권한 에러 상태 추가
   const token = localStorage.getItem('token');
 
   const stompClientRef = useRef<Client | null>(null);
@@ -22,6 +23,7 @@ const Tasks: React.FC = () => {
     setModalOpen(true);
     setTaskResult(null);
     setMessages([]);
+    setPermissionError(''); // 모달 열 때 권한 에러 리셋
   };
 
   const submitTaskFile = async (file: File, task: string) => {
@@ -32,6 +34,7 @@ const Tasks: React.FC = () => {
     try {
       setWaitingForTaskResult(true);
       setTaskResult(null);
+      setPermissionError(''); // 제출 시 권한 에러 리셋
 
       const formData = new FormData();
       formData.append('file', file);
@@ -50,9 +53,19 @@ const Tasks: React.FC = () => {
 
       subscribeTaskWebSocket(token);
 
-    } catch (e) {
-      alert('파일 제출 실패');
+    } catch (e: any) {
       setWaitingForTaskResult(false);
+
+      // 서버에서 접근 권한이 없는 경우
+      const responseMessage = e.response?.data?.message;
+      if (responseMessage === '접근 권한이 없습니다.') {
+        setPermissionError(responseMessage);
+        alert(responseMessage);
+        setModalOpen(false);
+        return;
+      }
+
+      alert('파일 제출 실패');
     }
   };
 
@@ -101,11 +114,17 @@ const Tasks: React.FC = () => {
 
   // 성공 메시지 파싱
   let showSuccess = false;
+
   if (taskResult) {
     try {
       const resultObj = typeof taskResult === 'string' ? JSON.parse(taskResult) : taskResult;
       const status = resultObj.status || (resultObj.data && resultObj.data.status) || '';
       showSuccess = status === 'success';
+
+      // WebSocket에서 "접근 권한이 없습니다."면 permissionError로 표시
+      if (status === 'fail' && resultObj.message === '접근 권한이 없습니다.') {
+        setPermissionError(resultObj.message);
+      }
     } catch (e) {
       showSuccess = false;
     }

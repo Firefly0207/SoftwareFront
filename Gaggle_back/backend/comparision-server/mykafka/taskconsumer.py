@@ -87,7 +87,7 @@ def run_consumer():
                 auto_offset_reset='earliest',
                 enable_auto_commit=True,
                 group_id='task-zip-consumer',
-                max_partition_fetch_bytes=104857600
+                max_partition_fetch_bytes=524288000
             )
             print("[Kafka 연결 성공]")
             break

@@ -124,7 +124,6 @@ def process_zip_message(message):
                     print(f" - PSNR 계산값: {psnr}")
                     print(f" - SSIM 계산값: {ssim}")
 
-                    time.sleep(0.5)
 
             except Exception as e:
                 psnr = None
@@ -174,7 +173,7 @@ def run_consumer():
                 auto_offset_reset='earliest',
                 enable_auto_commit=True,
                 group_id='python-zip-consumer',
-                max_partition_fetch_bytes=104857600 # 100MB
+                max_partition_fetch_bytes=524288000 # 100MB
             )
             print("[Kafka 연결 성공]")
             break   # 연결 성공 시 루프 탈출
